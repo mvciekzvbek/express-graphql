@@ -1,2 +1,1 @@
-# notogo-api
-Backend application
+# Express + GraphQL
