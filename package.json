@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server/index.js --exec babel-node"
+    "start": "nodemon index.js --exec babel-node"
   },
   "repository": {
     "type": "git",
@@ -14,12 +14,10 @@
   "author": "Maciej Ząbek",
   "license": "ISC",
   "dependencies": {
+    "apollo-server": "^2.4.8",
     "cors": "^2.8.5",
     "express": "^4.16.4",
-    "express-graphql": "^0.7.1",
-    "graphql": "^14.1.1",
-    "graphql-tools": "^4.0.4",
-    "merge-graphql-schemas": "^1.5.8"
+    "graphql": "^14.1.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.2.3",
@@ -27,7 +25,6 @@
     "@babel/node": "^7.2.2",
     "@babel/preset-env": "^7.3.1",
     "@babel/register": "^7.0.0",
-    "apollo-server-express": "^2.4.0",
     "nodemon": "^1.18.10"
   }
 }

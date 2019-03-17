@@ -1,0 +1,26 @@
+version: "3"
+services:
+  mongo:
+      image: mongo:latest
+      container_name: "mongo"
+      volumes:
+        - ./data/db:/data/db
+      ports:
+          - 27017:27017
+  app:
+    image: "node:10"
+    container_name: nodeapp
+    restart: always
+    build: .
+    links:
+      - mongo
+    depends_on:
+      - mongo
+    working_dir: /home/node/app
+    volumes:
+      - ./:/home/node/app
+    environment:
+      NODE_ENV: development
+    ports:
+      - 3000:3000
+    command: npm start
