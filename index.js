@@ -3,6 +3,7 @@ import { ApolloServer } from 'apollo-server';
 const typeDefs = `
     type Query {
         totalArticles: Int!
+        allArticles: [Article!]
     }
 
     type Mutation {
@@ -10,21 +11,41 @@ const typeDefs = `
             title: String!
             lead: String
             content: String!
-        ): Boolean!
+            imageUrl: String
+        ): Article!
+    }
+
+    type Article {
+        id: ID!
+        title: String!
+        lead: String!
+        content: String!
+        url: String!
+        imageUrl: String
     }
 `
-
+var _id = 0;
 const articles = [];
 
 const resolvers = {
     Query: {
-        totalArticles: () => articles.length
+        totalArticles: () => articles.length,
+        allArticles: () => articles
     },
     Mutation: {
         postArticle(parent, args) {
+
+            var newArticle = {
+                id: _id++,
+                ...args
+            }
+
             articles.push(args)
-            return true
+            return newArticle
         }
+    },
+    Article: {
+        url: parent => `http://example.com/article/${parent.id}`
     }
 }
 
