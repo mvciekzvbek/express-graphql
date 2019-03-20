@@ -7,12 +7,24 @@ const typeDefs = `
     }
 
     type Mutation {
-        postArticle(
-            title: String!
-            lead: String
-            content: String!
-            imageUrl: String
-        ): Article!
+        postArticle(input: PostArticleInput!): Article!
+    }
+
+    enum ArticleCategory {
+        Javascript
+        Python
+        HTML5
+        CSS3
+        Java
+        GraphQL
+        Node
+        React
+        Redux
+        Angular
+        Architecture
+        Microservices
+        DevOps
+        Docker
     }
 
     type Article {
@@ -22,6 +34,23 @@ const typeDefs = `
         content: String!
         url: String!
         imageUrl: String
+        categories: [ArticleCategory!]
+        postedBy: User!
+    }
+    
+    input PostArticleInput {
+        title: String!
+        lead: String!
+        content: String!
+        imageUrl: String
+        categories: [ArticleCategory!] = []
+    }
+
+    type User {
+        githubLogin: ID!
+        name: String
+        avatar: String
+        postedArticles: [Article!]
     }
 `
 var _id = 0;
@@ -37,7 +66,7 @@ const resolvers = {
 
             var newArticle = {
                 id: _id++,
-                ...args
+                ...args.input
             }
 
             articles.push(args)
