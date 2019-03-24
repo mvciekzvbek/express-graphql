@@ -1,10 +1,8 @@
 import { ApolloServer } from 'apollo-server-express'
 import express from 'express'
 import expressPlayground from 'graphql-playground-middleware-express'
-import { readFileSync } from 'fs'
 import resolvers from './resolvers'
-
-var typeDefs = readFileSync('./typeDefs.graphql', 'UTF-8')
+import { typeDefs } from './typeDefs'
 
 var app = express();
 

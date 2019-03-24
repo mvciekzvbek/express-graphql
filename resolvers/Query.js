@@ -9,8 +9,6 @@ const totalUsers = () => users.length
 
 const allUsers = () => users
 
-console.log(totalArticles)
-
 export {
     totalArticles,
     allArticles,
