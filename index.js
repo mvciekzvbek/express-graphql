@@ -1,88 +1,19 @@
-import { ApolloServer } from 'apollo-server';
+import { ApolloServer } from 'apollo-server-express'
+import express from 'express'
+import expressPlayground from 'graphql-playground-middleware-express'
+import { readFileSync } from 'fs'
+import resolvers from './resolvers'
 
-const typeDefs = `
-    type Query {
-        totalArticles: Int!
-        allArticles: [Article!]
-    }
+var typeDefs = readFileSync('./typeDefs.graphql', 'UTF-8')
 
-    type Mutation {
-        postArticle(input: PostArticleInput!): Article!
-    }
+var app = express();
 
-    enum ArticleCategory {
-        Javascript
-        Python
-        HTML5
-        CSS3
-        Java
-        GraphQL
-        Node
-        React
-        Redux
-        Angular
-        Architecture
-        Microservices
-        DevOps
-        Docker
-    }
+const server = new ApolloServer({ typeDefs, resolvers })
 
-    type Article {
-        id: ID!
-        title: String!
-        lead: String!
-        content: String!
-        url: String!
-        imageUrl: String
-        categories: [ArticleCategory!]
-        postedBy: User!
-    }
-    
-    input PostArticleInput {
-        title: String!
-        lead: String!
-        content: String!
-        imageUrl: String
-        categories: [ArticleCategory!] = []
-    }
+server.applyMiddleware({app})
 
-    type User {
-        githubLogin: ID!
-        name: String
-        avatar: String
-        postedArticles: [Article!]
-    }
-`
-var _id = 0;
-const articles = [];
+app.get('/', (req,res) => res.end('Welcome to my blog!'))
 
-const resolvers = {
-    Query: {
-        totalArticles: () => articles.length,
-        allArticles: () => articles
-    },
-    Mutation: {
-        postArticle(parent, args) {
+app.get('/playground', expressPlayground({ endpoint: '/graphql'}))
 
-            var newArticle = {
-                id: _id++,
-                ...args.input
-            }
-
-            articles.push(args)
-            return newArticle
-        }
-    },
-    Article: {
-        url: parent => `http://example.com/article/${parent.id}`
-    }
-}
-
-const server = new ApolloServer({
-    typeDefs,
-    resolvers
-})
-
-server
-    .listen(3000)
-    .then(({url}) => console.log(`GraphQL Service is running on ${url}`))
+app.listen({port: 3000}, () => console.log(`GraphQL Server running at http://localhost:3000${server.graphqlPath}`))
