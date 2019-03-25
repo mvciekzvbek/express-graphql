@@ -56,5 +56,11 @@ export const typeDefs = gql`
 
     type Mutation {
         postArticle(input: PostArticleInput!): Article!
+        githubAuth(code: String!): AuthPayload
+    }
+
+    type AuthPayload {
+        token: String!
+        user: User!
     }
 `
