@@ -22,7 +22,7 @@ async function githubAuth (parent, { code }, { db }) {
         name
     } = await authorizeWithGithub({
         client: '3d68acc66b2cb10108f6',
-        client_secret: 'd2a390397b5709238a8638dc5ae9aff751de96c5',
+        client_secret: '1e6cdd2f7413dedc5532dbeee593563cd962791f',
         code
     })
 
