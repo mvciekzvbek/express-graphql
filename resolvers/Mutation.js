@@ -21,8 +21,8 @@ async function githubAuth (parent, { code }, { db }) {
         login,
         name
     } = await authorizeWithGithub({
-        client: '3d68acc66b2cb10108f6',
-        client_secret: '1e6cdd2f7413dedc5532dbeee593563cd962791f',
+        client_id: '3d68acc66b2cb10108f6',
+        client_secret: '69678a5d81a9ae01e1f417af31fb5c541896fe15',
         code
     })
 
@@ -32,8 +32,8 @@ async function githubAuth (parent, { code }, { db }) {
 
     let latestUserInfo = {
         name,
-        githubLogin,
-        githubToken,
+        githubLogin: login,
+        githubToken: access_token,
         avatar: avatar_url
     }
 
@@ -41,7 +41,7 @@ async function githubAuth (parent, { code }, { db }) {
         .collection('users')
         .replaceOne({githubLogin: login}, latestUserInfo, { upsert: true})
 
-    return { user, token, access_token }
+    return { user, token: access_token }
 }
 
 export {
