@@ -1,4 +1,7 @@
 import { authorizeWithGithub } from "../utlis/utils";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const postArticle = (parent, args) => {
     
@@ -21,8 +24,8 @@ async function githubAuth (parent, { code }, { db }) {
         login,
         name
     } = await authorizeWithGithub({
-        client_id: '3d68acc66b2cb10108f6',
-        client_secret: '69678a5d81a9ae01e1f417af31fb5c541896fe15',
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
         code
     })
 
