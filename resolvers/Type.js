@@ -1,10 +1,13 @@
 import { GraphQLScalarType } from 'graphql'
 
 const Article = {
-    url: parent => `http://example.com/article/${parent.id}`,
-    postedBy: parent => {
-        return users.find(u => u.githubLogin === parent.gihubUser)
-    }
+    id: parent => parent.id || parent._id,
+    url: parent => {
+        console.log(parent);
+        return `http://example.com/articles/${parent._id}`
+    },
+    postedBy: (parent, args, {db}) => 
+        db.collection('users').findOne({githubLogin: parent.userID})
 }
 
 const User = {

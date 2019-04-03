@@ -1,17 +1,29 @@
 import { authorizeWithGithub } from "../utlis/utils";
+import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const postArticle = (parent, args) => {
+const postArticle = async (parent, args, {db, currentUser}) => {
     
-    var newArticle = {
-        id: _id++,
+    if (!currentUser) {
+        throw new Error('only an authorized user can post an article');
+    }
+
+    const newArticle = {
         ...args.input,
+        userID: currentUser.githubLogin,
         created: new Date()
     }
 
-    articles.push(args)
+    console.log(newArticle);
+
+    const { insertedId } = await db.collection('articles').insertOne(newArticle);
+
+    console.log(insertedId);
+
+    newArticle.id = insertedId;
+
     return newArticle
 }
 
@@ -47,7 +59,39 @@ async function githubAuth (parent, { code }, { db }) {
     return { user, token: access_token }
 }
 
+const addFakeUsers = async (root, {count}, {db}) => {
+    const randomUserApi = `https://randomuser.me/api/?results=${count}`
+
+    const { results } = await fetch(randomUserApi).then(res => res.json())
+
+    const users = results.map(r => ({
+      githubLogin: r.login.username,
+      name: `${r.name.first} ${r.name.last}`,
+      avatar: r.picture.thumbnail,
+      githubToken: r.login.sha1
+    }))
+
+    await db.collection('users').insert(users)
+
+    return users
+}
+
+const fakeUserAuth = async (parent, {githubLogin}, {db}) => {
+    const user = await db.collection('users').findOne({ githubLogin })
+
+    if (!user) {
+      throw new Error(`Cannot find user with githubLogin "${githubLogin}"`)
+    }
+
+    return {
+      token: user.githubToken,
+      user
+    }
+}
+
 export {
     postArticle,
-    githubAuth
+    githubAuth,
+    addFakeUsers,
+    fakeUserAuth
 }

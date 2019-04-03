@@ -12,9 +12,9 @@ services:
     container_name: nodeapp
     restart: always
     build: .
-    links:
-      - mongo
     depends_on:
+      - mongo
+    links:
       - mongo
     working_dir: /home/node/app
     volumes:

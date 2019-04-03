@@ -52,11 +52,14 @@ export const typeDefs = gql`
         allArticles(after: DateTime, postedBy: ID): [Article!]
         totalUsers: Int!
         allUsers: [User!]
+        me: User
     }
 
     type Mutation {
         postArticle(input: PostArticleInput!): Article!
-        githubAuth(code: String!): AuthPayload
+        githubAuth(code: String!): AuthPayload!
+        addFakeUsers(count: Int = 1): [User!]!
+        fakeUserAuth(githubLogin: ID!): AuthPayload!
     }
 
     type AuthPayload {

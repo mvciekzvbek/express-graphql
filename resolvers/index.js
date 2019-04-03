@@ -1,6 +1,8 @@
 import * as Query from './Query'
 import * as Mutation from './Mutation'
-import Type from './Type'
+import * as Type from './Type'
+
+console.log(Type);
 
 const resolvers = {
   Query,

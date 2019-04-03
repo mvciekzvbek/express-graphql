@@ -16,9 +16,12 @@ const allUsers = (parent, args, { db }) =>
         .find()
         .toArray()
 
+const me = (parent, args, {currentUser}) => currentUser
+
 export {
     totalArticles,
     allArticles,
     totalUsers,
-    allUsers
+    allUsers,
+    me
 }
