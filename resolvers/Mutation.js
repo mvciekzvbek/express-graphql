@@ -16,11 +16,7 @@ const postArticle = async (parent, args, {db, currentUser}) => {
         created: new Date()
     }
 
-    console.log(newArticle);
-
     const { insertedId } = await db.collection('articles').insertOne(newArticle);
-
-    console.log(insertedId);
 
     newArticle.id = insertedId;
 

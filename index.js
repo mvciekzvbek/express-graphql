@@ -5,6 +5,7 @@ import resolvers from './resolvers';
 import { typeDefs } from './typeDefs';
 import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
+import { createServer } from 'http';
 
 dotenv.config();
 
@@ -45,8 +46,6 @@ async function start () {
         }
     });
 
-
-
     server.applyMiddleware({app});
 
     app.get('/', (req,res) => res.end('Welcome to my blog!'));
@@ -54,6 +53,14 @@ async function start () {
     app.get('/playground', expressPlayground({ endpoint: '/graphql'}));
 
     app.listen({port: 3000}, () => console.log(`GraphQL Server running at http://localhost:3000${server.graphqlPath}`));
+
+    const httpServer = createServer(app)
+    server.installSubscriptionHandlers(httpServer)
+    httpServer.timeout = 5000
+
+    httpServer.listen({ port: 4000 }, () =>
+        console.log(`GraphQL Server running at http://localhost:4000${server.graphqlPath}`)
+    )
 }
 
 start()
