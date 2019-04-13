@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const postArticle = async (parent, args, {db, currentUser}) => {
+const postArticle = async (parent, args, {db, currentUser, pubsub}) => {
     
     if (!currentUser) {
         throw new Error('only an authorized user can post an article');
@@ -20,10 +20,12 @@ const postArticle = async (parent, args, {db, currentUser}) => {
 
     newArticle.id = insertedId;
 
+    pubsub.publish('article-added', {newArticle});
+
     return newArticle
 }
 
-async function githubAuth (parent, { code }, { db }) {
+async function githubAuth (parent, {code}, {db, pubsub}) {
 
     let {
         message,
@@ -48,14 +50,16 @@ async function githubAuth (parent, { code }, { db }) {
         avatar: avatar_url
     }
 
-    const { ops:[user] } = await db
+    const { ops:[user], result } = await db
         .collection('users')
         .replaceOne({githubLogin: login}, latestUserInfo, { upsert: true})
+
+    result.upserted && pubsub.publish('user-added', {newUser: user})    
 
     return { user, token: access_token }
 }
 
-const addFakeUsers = async (root, {count}, {db}) => {
+const addFakeUsers = async (root, {count}, {db, pubsub}) => {
     const randomUserApi = `https://randomuser.me/api/?results=${count}`
 
     const { results } = await fetch(randomUserApi).then(res => res.json())
@@ -67,7 +71,15 @@ const addFakeUsers = async (root, {count}, {db}) => {
       githubToken: r.login.sha1
     }))
 
-    await db.collection('users').insert(users)
+    await db.collection('users').insertMany(users)
+
+    let newUsers = await db.collection('users')
+        .find()
+        .sort({_id: -1})
+        .limit(count)
+        .toArray()
+
+    newUsers.forEach(newUser => pubsub.publish('user-added', {newUser}));
 
     return users
 }

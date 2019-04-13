@@ -66,4 +66,9 @@ export const typeDefs = gql`
         token: String!
         user: User!
     }
+
+    type Subscription {
+        newArticle: Article!
+        newUser: User!
+    }
 `

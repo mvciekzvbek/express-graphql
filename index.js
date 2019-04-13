@@ -1,4 +1,4 @@
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer, PubSub } from 'apollo-server-express';
 import express from 'express';
 import expressPlayground from 'graphql-playground-middleware-express';
 import resolvers from './resolvers';
@@ -13,6 +13,7 @@ async function start () {
 
     const app = express();
     const MONGO_DB = 'mongodb://mongo/blog';
+    const pubsub = new PubSub();
     let db;
 
 
@@ -33,16 +34,16 @@ async function start () {
     const server = new ApolloServer({ 
         typeDefs, 
         resolvers, 
-        context: async ({req}) => {
+        context: async ({req, connection}) => {
+            const githubToken = req ? 
+                req.headers.authorization :
+                connection.context.Authorization
 
-            // console.log(req.headers);
+            const currentUser = await db
+                .collection('users')
+                .findOne({githubToken})
 
-            const githubToken = req.headers.authorization;
-
-            // console.log(githubToken);
-            const currentUser = await db.collection('users').findOne({githubToken})
-            // console.log(currentUser);
-            return { db, currentUser}
+            return { db, currentUser, pubsub}
         }
     });
 
@@ -61,6 +62,7 @@ async function start () {
     httpServer.listen({ port: 4000 }, () =>
         console.log(`GraphQL Server running at http://localhost:4000${server.graphqlPath}`)
     )
+    
 }
 
 start()
