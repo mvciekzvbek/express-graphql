@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const postArticle = async (parent, args, {db, currentUser, pubsub}) => {
-    
+
     if (!currentUser) {
         throw new Error('only an authorized user can post an article');
     }
