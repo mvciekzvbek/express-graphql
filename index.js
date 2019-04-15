@@ -4,8 +4,11 @@ import expressPlayground from 'graphql-playground-middleware-express';
 import resolvers from './resolvers';
 import { typeDefs } from './typeDefs';
 import { MongoClient } from 'mongodb';
-import dotenv from 'dotenv';
 import { createServer } from 'http';
+import depthLimit from 'graphql-depth-limit';
+import { createComplexityLimitRule } from 'graphql-validation-complexity';
+import { performance } from 'perf_hooks';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -34,6 +37,12 @@ async function start () {
     const server = new ApolloServer({ 
         typeDefs, 
         resolvers, 
+        validationRules: [
+            depthLimit(5),
+            createComplexityLimitRule(1000, {
+                onCost: cost => console.log('query cost: ', cost)
+            })
+        ],
         context: async ({req, connection}) => {
             const githubToken = req ? 
                 req.headers.authorization :
@@ -43,7 +52,11 @@ async function start () {
                 .collection('users')
                 .findOne({githubToken})
 
-            return { db, currentUser, pubsub}
+            return { 
+                db, 
+                currentUser, 
+                pubsub, 
+                timestamp: performance.now()}
         }
     });
 

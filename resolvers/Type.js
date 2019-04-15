@@ -3,7 +3,7 @@ import { GraphQLScalarType } from 'graphql'
 const Article = {
     id: parent => parent.id || parent._id,
     url: parent => {
-        console.log(parent);
+        // console.log(parent);
         return `http://example.com/articles/${parent._id}`
     },
     postedBy: (parent, args, {db}) => 
