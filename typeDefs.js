@@ -47,8 +47,8 @@ export const typeDefs = gql`
     }
 
     input DateRange {
-        start: DateTime!
-        end: DateTime!
+        start: DateTime
+        end: DateTime
     }
 
     input DataPage {

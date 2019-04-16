@@ -3,10 +3,19 @@ const totalArticles = (parent, args, { db }) =>
         .estimatedDocumentCount()
 
 const allArticles = (parent, args, { db }) => {
-    console.log(args);
-    const { filter, paging } = args; 
+    const { filter, paging } = args;     
+    const createdFilterStart = filter.createdBetween && filter.createdBetween.start ? filter.createdBetween.start : new Date('1/1/1');
+    const createdFilterEnd = filter.createdBetween && filter.createdBetween.end ? filter.createdBetween.start : new Date('1/1/9999');
+
+
     return db.collection('articles')
-        .find({categories: filter.category})
+        .find({
+            categories: filter.category,
+            created: {
+                $gt: createdFilterStart,
+                $lt: createdFilterEnd
+            }
+        })
         .limit(paging.first)
         .skip(paging.start)
         .toArray()
