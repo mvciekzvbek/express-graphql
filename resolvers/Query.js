@@ -3,22 +3,43 @@ const totalArticles = (parent, args, { db }) =>
         .estimatedDocumentCount()
 
 const allArticles = (parent, args, { db }) => {
-    const { filter, paging } = args;     
-    const createdFilterStart = filter.createdBetween && filter.createdBetween.start ? filter.createdBetween.start : new Date('1/1/1');
-    const createdFilterEnd = filter.createdBetween && filter.createdBetween.end ? filter.createdBetween.start : new Date('1/1/9999');
+    const { filter, paging } = args,
+        createdFilterStart = filter.createdBetween && filter.createdBetween.start ? filter.createdBetween.start : new Date('1/1/1'),
+        createdFilterEnd = filter.createdBetween && filter.createdBetween.end ? filter.createdBetween.end : new Date('1/1/9999');
+    let result;
 
+    /**
+     * If there are category filters look for them
+     * if not, do not apply category filter
+     */
+    if (filter && filter.category.length > 0) {
+        result = db.collection('articles')
+            .find({
+                categories: {
+                    $in: filter.category
+                },
+                created: {
+                    $gt: createdFilterStart,
+                    $lt: createdFilterEnd
+                }
+            })
+            .limit(paging.first)
+            .skip(paging.start)
+            .toArray()
+    } else {
+        result = db.collection('articles')
+            .find({
+                created: {
+                    $gt: createdFilterStart,
+                    $lt: createdFilterEnd
+                }
+            })
+            .limit(paging.first)
+            .skip(paging.start)
+            .toArray()
+    }
 
-    return db.collection('articles')
-        .find({
-            categories: filter.category,
-            created: {
-                $gt: createdFilterStart,
-                $lt: createdFilterEnd
-            }
-        })
-        .limit(paging.first)
-        .skip(paging.start)
-        .toArray()
+    return result;
 }
 
 const totalUsers = (parent, args, { db }) => 

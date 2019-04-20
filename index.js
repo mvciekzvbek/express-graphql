@@ -19,7 +19,6 @@ async function start () {
     const pubsub = new PubSub();
     let db;
 
-
     try {
         const client = await MongoClient.connect(MONGO_DB, { useNewUrlParser: true });
         db = client.db();
@@ -68,9 +67,9 @@ async function start () {
 
     app.listen({port: 3000}, () => console.log(`GraphQL Server running at http://localhost:3000${server.graphqlPath}`));
 
-    const httpServer = createServer(app)
-    server.installSubscriptionHandlers(httpServer)
-    httpServer.timeout = 5000
+    const httpServer = createServer(app);
+    server.installSubscriptionHandlers(httpServer);
+    httpServer.timeout = 5000;
 
     httpServer.listen({ port: 4000 }, () =>
         console.log(`GraphQL Server running at http://localhost:4000${server.graphqlPath}`)
@@ -78,4 +77,4 @@ async function start () {
     
 }
 
-start()
+start();

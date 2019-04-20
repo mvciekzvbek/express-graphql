@@ -41,7 +41,7 @@ export const typeDefs = gql`
     }
 
     input ArticleFilter {
-        category: ArticleCategory
+        category: [ArticleCategory!]! = []
         createdBetween: DateRange
         searchText: String
     }
