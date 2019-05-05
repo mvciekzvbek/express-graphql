@@ -9,7 +9,7 @@ services:
           - 27017:27017
   app:
     image: "node:10"
-    container_name: nodeapp
+    container_name: express-graphql
     restart: always
     build: .
     depends_on:
