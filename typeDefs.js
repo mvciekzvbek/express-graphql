@@ -44,6 +44,14 @@ export const typeDefs = gql`
         category: [ArticleCategory!]! = []
         createdBetween: DateRange
         searchText: String
+        createdBy: String
+        id: ID
+    }
+
+    input UserFilter {
+        id: ID
+        githubLogin: String
+        name: String
     }
 
     input DateRange {
@@ -68,12 +76,23 @@ export const typeDefs = gql`
         categories
     }
 
-    input DataSort {
+    enum SortableUserField {
+        githubLogin
+        name
+    }
+
+    input DataArticleSort {
         sort: SortDirection = DESCENDING
         sortBy: SortableArticleField = created
     }
 
+    input DataUserSort {
+        sort: SortDirection = DESCENDING
+        sortBy: SortableUserField = githubLogin
+    }
+
     type User {
+        id: ID!
         githubLogin: ID!
         name: String
         avatar: String
@@ -82,9 +101,9 @@ export const typeDefs = gql`
 
     type Query {
         totalArticles: Int!
-        allArticles(filter: ArticleFilter paging: DataPage sorting: DataSort): [Article!]
+        allArticles(filter: ArticleFilter paging: DataPage = { first: 12, start: 0 } sorting: DataArticleSort = {sort: DESCENDING, sortBy: githubLogin }): [Article!]
         totalUsers: Int!
-        allUsers(paging: DataPage sorting: DataSort): [User!]
+        allUsers(filter: UserFilter paging: DataPage = { first: 12, start: 0 } sorting: DataUserSort = {sort: DESCENDING, sortBy: githubLogin }): [User!]
         me: User
     }
 

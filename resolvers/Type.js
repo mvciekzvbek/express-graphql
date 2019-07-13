@@ -3,16 +3,18 @@ import { GraphQLScalarType } from 'graphql'
 const Article = {
     id: parent => parent.id || parent._id,
     url: parent => {
-        // console.log(parent);
-        return `http://example.com/articles/${parent._id}`
+        return `/articles/${parent._id}`
     },
     postedBy: (parent, args, {db}) => 
-        db.collection('users').findOne({githubLogin: parent.userID})
+        db.get().collection('users').findOne({githubLogin: parent.userID})
 }
 
 const User = {
-    postedArticles: parent => {
-        return articles.filter(a => a.gihubUser === parent.githubLogin)
+    id: parent => parent.id || parent._id,
+    postedArticles: (parent, args, {db}) => {
+        return db.get().collection('articles')
+            .find({"userID": parent.githubLogin})
+            .toArray()
     }
 }
 
