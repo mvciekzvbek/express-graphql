@@ -1,0 +1,130 @@
+import { authorizeWithGithub } from "../utlis/utils";
+import fetch from 'node-fetch';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const postArticle = async (parent, args, {db, currentUser, pubsub}) => {
+
+    if (!currentUser) {
+        throw new Error('only an authorized user can post an article');
+    }
+
+    const id = await db.getNextSequence("articleid");
+
+    const newArticle = {
+        ...args.input,
+        "_id": id,
+        userID: currentUser.githubLogin,
+        created: new Date()
+    }
+
+    const { insertedId } = await db.get().collection('articles').insertOne(newArticle);
+
+    newArticle.id = insertedId;
+
+    pubsub.publish('article-added', {newArticle});
+
+    return newArticle
+}
+
+async function githubAuth (parent, {code}, {db, pubsub}) {
+
+    let {
+        message,
+        access_token,
+        avatar_url,
+        login,
+        name
+    } = await authorizeWithGithub({
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        code
+    })
+
+    if (message) {
+        throw new Error(message);
+    }
+
+    let latestUserInfo = {
+        name,
+        githubLogin: login,
+        githubToken: access_token,
+        avatar: avatar_url
+    }
+
+    const isInDb = await db.get()
+            .collection('users')
+            .findOne({name: latestUserInfo.name});
+
+    let usr;
+
+    if (isInDb) {
+        const { ops:[user] } = await db.get()
+            .collection('users')
+            .replaceOne({githubLogin: login}, latestUserInfo, {upsert: true})
+        usr = user;
+    } else {
+        const id = await db.getNextSequence("userid");
+        latestUserInfo = {
+            _id: id,
+            ...latestUserInfo
+        }
+
+        const { ops:[user], result} = await db.get().collection('users').insertOne(latestUserInfo);
+        usr = user;
+
+        result.upserted && pubsub.publish('user-added', {newUser: usr})    
+    }
+
+    return { usr, token: access_token }
+}
+
+const addFakeUsers = async (root, {count}, {db, pubsub}) => {
+    count = 1
+    const randomUserApi = `https://randomuser.me/api/?results=${count}`
+
+    const { results } = await fetch(randomUserApi).then(res => res.json())
+
+    const id = await db.getNextSequence('userid');
+    
+    const users = results.map(r => ({
+        "_id": id,
+        githubLogin: r.login.username,
+        name: `${r.name.first} ${r.name.last}`,
+        avatar: r.picture.thumbnail,
+        githubToken: r.login.sha1
+    }))
+
+    await db.get().collection('users').insertMany(users)
+
+    let newUsers = await db.get().collection('users')
+        .find()
+        .sort({_id: -1})
+        .limit(count)
+        .toArray()
+
+    newUsers.forEach(newUser => pubsub.publish('user-added', {newUser}));
+
+    return users
+}
+
+const fakeUserAuth = async (parent, {githubLogin}, {db}) => {
+    const user = await db.get().collection('users').findOne({ githubLogin })
+
+    if (!user) {
+      throw new Error(`Cannot find user with githubLogin "${githubLogin}"`)
+    }
+
+    return {
+      token: user.githubToken,
+      user
+    }
+}
+
+export {
+    postArticle,
+    githubAuth,
+    addFakeUsers,
+    fakeUserAuth
+}
