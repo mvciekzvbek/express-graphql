@@ -1,8 +1,6 @@
 import { authorizeWithGithub } from "../utlis/utils";
 import fetch from 'node-fetch';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import 'dotenv/config';
 
 const postArticle = async (parent, args, {db, currentUser, pubsub}) => {
 
@@ -11,17 +9,31 @@ const postArticle = async (parent, args, {db, currentUser, pubsub}) => {
     }
 
     const id = await db.getNextSequence("articleid");
+    const { input } = args;
+    const categoriesNames = input.categories;
+    let categoriesIds = [];
+
+    for (let name of categoriesNames) {
+        const category = await db.get()
+            .collection('categories')
+            .findOne({name: name});
+
+        categoriesIds.push(category["_id"])
+    }
+
+    const fieldsToDb = {
+        ...args.input, 
+        categories: categoriesIds
+    }
 
     const newArticle = {
-        ...args.input,
+        ...fieldsToDb,
         "_id": id,
         userID: currentUser.githubLogin,
         created: new Date()
     }
-
-    const { insertedId } = await db.get().collection('articles').insertOne(newArticle);
-
-    newArticle.id = insertedId;
+    
+    await db.get().collection('articles').insertOne(newArticle);
 
     pubsub.publish('article-added', {newArticle});
 
@@ -122,9 +134,27 @@ const fakeUserAuth = async (parent, {githubLogin}, {db}) => {
     }
 }
 
+const addCategory = async (parent, args, {db, currentUser}) => {
+    if (!currentUser) {
+        throw new Error('only an authorized user can post an article');
+    }
+
+    const id = await db.getNextSequence("categoryid");
+
+    const newCategory = {
+        "name": args.name,
+        "_id": id,
+    }
+
+    await db.get().collection('categories').insertOne(newCategory);
+
+    return newCategory;
+}
+
 export {
     postArticle,
     githubAuth,
     addFakeUsers,
-    fakeUserAuth
+    fakeUserAuth,
+    addCategory
 }

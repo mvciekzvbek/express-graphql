@@ -5,15 +5,38 @@ const Article = {
     url: parent => {
         return `/articles/${parent._id}`
     },
-    postedBy: (parent, args, {db}) => 
-        db.get().collection('users').findOne({githubLogin: parent.userID})
+    authors: (parent, args, {db}) => {
+        return db.get().collection('users')
+            .find({githubLogin: parent.userID})
+            .toArray()
+    },
+    categories: async (parent, args, {db}) => {
+        let categoriesToDisplay = [];
+
+        for (let id of parent.categories) {
+            const category = await db.get().collection('categories')
+                .findOne({_id: id})
+            categoriesToDisplay.push(category);
+        }
+
+        return categoriesToDisplay;
+    }
 }
 
 const User = {
     id: parent => parent.id || parent._id,
-    postedArticles: (parent, args, {db}) => {
+    articles: (parent, args, {db}) => {
         return db.get().collection('articles')
             .find({"userID": parent.githubLogin})
+            .toArray()
+    }
+}
+
+const Category = {
+    id: parent => parent.id || parent._id,
+    articles: (parent, args, {db}) => {
+        return db.get().collection('articles')
+            .find({"categories": parent._id})
             .toArray()
     }
 }
@@ -29,5 +52,6 @@ const DateTime = new GraphQLScalarType({
 export {
     Article,
     User,
+    Category,
     DateTime
 }
