@@ -8,7 +8,7 @@ const allArticles = async (parent, args, { db }) => {
         createdFilterEnd =  filter && filter.createdBetween && filter.createdBetween.end || new Date('1/1/2099'),
         searchText = filter && filter.searchText,
         sortBy = sorting && sorting.sortBy || 'created';
-
+        
     var sort = {};
     sort[sortBy] = -1;
     
@@ -107,7 +107,7 @@ const usersCount = async (parent, args, { db }) =>
 
 const allUsers = async (parent, args, { db }) => {
     const {filter, paging, sorting} = args;
-    
+
     if (filter && filter.id) {
         return await db.get().collection('users')
             .find({_id: parseInt(filter.id,10)})
