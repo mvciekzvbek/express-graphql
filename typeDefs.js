@@ -122,7 +122,7 @@ export const typeDefs = gql`
 
     type Query {
         articlesCount: Int!
-        allArticles(filter: ArticleFilter paging: DataPage = { first: 12, start: 0 } sorting: DataArticleSort = {sort: DESCENDING, sortBy: title }): [Article!]
+        allArticles(filter: ArticleFilter paging: DataPage = { first: 6, start: 0 } sorting: DataArticleSort = {sort: DESCENDING, sortBy: created }): [Article!]
         usersCount: Int!
         allUsers(filter: UserFilter paging: DataPage = { first: 12, start: 0 } sorting: DataUserSort = {sort: DESCENDING, sortBy: githubLogin }): [User!],
         allCategories(filter: CategoryFilter paging: DataPage = { first: 12, start: 0 } sorting: DataCategorySort = {sort: DESCENDING, sortBy: name }): [Category!]!,
