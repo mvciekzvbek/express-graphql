@@ -36,6 +36,7 @@ export const typeDefs = gql`
         id: ID!
         name: ArticleCategory!
         articles: [Article!]
+        thumbnail: String
     }
 
     input PostArticleInput {
@@ -133,7 +134,7 @@ export const typeDefs = gql`
         postArticle(input: PostArticleInput!): Article!
         githubAuth(code: String!): AuthPayload!
         addFakeUsers(count: Int = 1): [User!]!
-        addCategory(name: String): Category!
+        addCategory(name: String, thumbnail: String): Category!
         fakeUserAuth(githubLogin: ID!): AuthPayload!
     }
 
