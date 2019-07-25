@@ -20,7 +20,7 @@ async function start () {
             resolvers, 
             validationRules: [
                 depthLimit(5),
-                createComplexityLimitRule(1000, {
+                createComplexityLimitRule(3000, {
                     onCost: cost => console.log('query cost: ', cost)
                 })
             ],
