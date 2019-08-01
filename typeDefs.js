@@ -26,10 +26,10 @@ export const typeDefs = gql`
         lead: String!
         content: String!
         url: String!
-        imageUrl: String
+        image_url: String
         categories: [Category!]
-        authors: [User!]
-        created: DateTime!
+        author: User!
+        created_at: DateTime!
     }
 
     type Category {
@@ -43,7 +43,7 @@ export const typeDefs = gql`
         title: String!
         lead: String!
         content: String!
-        imageUrl: String
+        image_url: String
         categories: [ArticleCategory!] = []
     }
 
@@ -117,7 +117,7 @@ export const typeDefs = gql`
         id: ID!
         githubLogin: ID!
         name: String
-        avatar: String
+        avatar_url: String
         articles: [Article!]
     }
 

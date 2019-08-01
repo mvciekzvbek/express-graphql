@@ -5,15 +5,14 @@ const Article = {
     url: parent => {
         return `/articles/${parent._id}`
     },
-    authors: (parent, args, {db}) => {
+    author: (parent, args, {db}) => {
         return db.get().collection('users')
-            .find({githubLogin: parent.userID})
-            .toArray()
+            .findOne({githubLogin: parent.author_name})
     },
     categories: async (parent, args, {db}) => {
         let categoriesToDisplay = [];
 
-        for (let id of parent.categories) {
+        for (let id of parent['categories_ids']) {
             const category = await db.get().collection('categories')
                 .findOne({_id: id})
             categoriesToDisplay.push(category);
@@ -27,7 +26,7 @@ const User = {
     id: parent => parent.id || parent._id,
     articles: (parent, args, {db}) => {
         return db.get().collection('articles')
-            .find({"userID": parent.githubLogin})
+            .find({"author_name": parent.githubLogin})
             .toArray()
     }
 }
@@ -36,7 +35,7 @@ const Category = {
     id: parent => parent.id || parent._id,
     articles: (parent, args, {db}) => {
         return db.get().collection('articles')
-            .find({"categories": parent._id})
+            .find({"categories_ids": parent._id})
             .toArray()
     }
 }

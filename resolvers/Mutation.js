@@ -9,7 +9,7 @@ const postArticle = async (parent, args, {db, currentUser, pubsub}) => {
     }
 
     const id = await db.getNextSequence("articleid");
-    const { input } = args;
+    let { input } = args;
     const categoriesNames = input.categories;
     let categoriesIds = [];
 
@@ -21,16 +21,14 @@ const postArticle = async (parent, args, {db, currentUser, pubsub}) => {
         categoriesIds.push(category["_id"])
     }
 
-    const fieldsToDb = {
-        ...args.input, 
-        categories: categoriesIds
-    }
+    delete input.categories;
 
     const newArticle = {
-        ...fieldsToDb,
+        ...input,
         "_id": id,
-        userID: currentUser.githubLogin,
-        created: new Date()
+        "author_name": currentUser.githubLogin,
+        "created_at": new Date(),
+        "categories_ids": categoriesNames
     }
     
     await db.get().collection('articles').insertOne(newArticle);
@@ -62,7 +60,7 @@ async function githubAuth (parent, {code}, {db, pubsub}) {
         name,
         githubLogin: login,
         githubToken: access_token,
-        avatar: avatar_url
+        avatar_url: avatar_url
     }
 
     const isInDb = await db.get()
@@ -104,7 +102,7 @@ const addFakeUsers = async (root, {count}, {db, pubsub}) => {
         "_id": id,
         githubLogin: r.login.username,
         name: `${r.name.first} ${r.name.last}`,
-        avatar: r.picture.thumbnail,
+        avatar_url: r.picture.thumbnail,
         githubToken: r.login.sha1
     }))
 

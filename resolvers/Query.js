@@ -7,11 +7,11 @@ const allArticles = async (parent, args, { db }) => {
         createdFilterStart = filter && filter.createdBetween && filter.createdBetween.start || new Date('1/1/1'),
         createdFilterEnd =  filter && filter.createdBetween && filter.createdBetween.end || new Date('1/1/2099'),
         searchText = filter && filter.searchText,
-        sortBy = sorting && sorting.sortBy || 'created';
-        
+        sortBy = sorting && sorting.sortBy || 'created_at';
+
     var sort = {};
     sort[sortBy] = -1;
-    
+
     let result;
     if (filter && filter.categories.length > 0 && !searchText && !filter.id) {
         // filter by categories only
@@ -29,7 +29,7 @@ const allArticles = async (parent, args, { db }) => {
                 categories: {
                     $in: categories
                 },
-                created: {
+                "created_at": {
                     $gt: createdFilterStart,
                     $lt: createdFilterEnd
                 }
@@ -42,7 +42,7 @@ const allArticles = async (parent, args, { db }) => {
         // filter by id only
         result = await db.get().collection('articles')
             .find({
-                created: {
+                "created_at": {
                     $gt: createdFilterStart,
                     $lt: createdFilterEnd
                 },
@@ -56,7 +56,7 @@ const allArticles = async (parent, args, { db }) => {
          // filter by searchtext only
          result = await db.get().collection('articles')
          .find({
-             created: {
+             "created_at": {
                  $gt: createdFilterStart,
                  $lt: createdFilterEnd
              },
@@ -72,7 +72,7 @@ const allArticles = async (parent, args, { db }) => {
         // filter by search text && id
         result = await db.get().collection('articles')
             .find({
-                created: {
+                "created_at": {
                     $gt: createdFilterStart,
                     $lt: createdFilterEnd
                 },
@@ -88,7 +88,7 @@ const allArticles = async (parent, args, { db }) => {
     } else {
         result = await db.get().collection('articles')
             .find({
-                created: {
+                "created_at": {
                     $gt: createdFilterStart,
                     $lt: createdFilterEnd
                 }
