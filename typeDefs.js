@@ -1,24 +1,7 @@
-import {gql} from 'apollo-server-express'
+import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
     scalar DateTime
-
-    enum ArticleCategory {
-        Javascript
-        Python
-        HTML5
-        CSS3
-        Java
-        GraphQL
-        Node
-        React
-        Redux
-        Angular
-        Architecture
-        Microservices
-        DevOps
-        Docker
-    }
 
     type Article {
         id: ID!
@@ -34,7 +17,7 @@ export const typeDefs = gql`
 
     type Category {
         id: ID!
-        name: ArticleCategory!
+        name: String!
         articles: [Article!]
         thumbnail: String
     }
@@ -44,21 +27,22 @@ export const typeDefs = gql`
         lead: String!
         content: String!
         image_url: String
-        categories: [ArticleCategory!] = []
+        categories: [String!]
     }
 
     input ArticleFilter {
-        categories: [ArticleCategory!]! = []
+        categoriesByNames: [String!] = []
+        categoriesByIds: [Int!] = []
         createdBetween: DateRange
-        searchText: String
-        createdBy: String
+        text: String
+        authorById: Int
+        authorByName: String
         id: ID
     }
 
     input UserFilter {
         id: ID
-        githubLogin: String
-        name: String
+        username: String
     }
 
     input CategoryFilter {
@@ -121,12 +105,27 @@ export const typeDefs = gql`
         articles: [Article!]
     }
 
+    type AllArticlesResult {
+        hits: [Article!]!
+        count: Int
+    }
+
+    type AllUsersResult {
+        hits: [User!]!
+        count: Int
+    }
+
+    type AllCategoriesResult {
+        hits: [Category!]!
+        count: Int
+    }
+
     type Query {
         articlesCount: Int!
-        allArticles(filter: ArticleFilter paging: DataPage = { first: 6, start: 0 } sorting: DataArticleSort = {sort: DESCENDING, sortBy: created }): [Article!]
+        allArticles(filter: ArticleFilter paging: DataPage = { first: 6, start: 0 } sorting: DataArticleSort = {sort: DESCENDING, sortBy: created_at}): AllArticlesResult!
         usersCount: Int!
-        allUsers(filter: UserFilter paging: DataPage = { first: 12, start: 0 } sorting: DataUserSort = {sort: DESCENDING, sortBy: githubLogin }): [User!],
-        allCategories(filter: CategoryFilter paging: DataPage = { first: 12, start: 0 } sorting: DataCategorySort = {sort: DESCENDING, sortBy: name }): [Category!]!,
+        allUsers(filter: UserFilter paging: DataPage = { first: 30, start: 0 } sorting: DataUserSort = {sort: DESCENDING, sortBy: githubLogin }): AllUsersResult!
+        allCategories(filter: CategoryFilter paging: DataPage = { first: 12, start: 0 } sorting: DataCategorySort = {sort: DESCENDING, sortBy: name }): AllCategoriesResult!,
         me: User
     }
 
@@ -147,4 +146,4 @@ export const typeDefs = gql`
         newArticle: Article!
         newUser: User!
     }
-`
+`;

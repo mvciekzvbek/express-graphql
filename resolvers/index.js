@@ -1,13 +1,13 @@
-import * as Query from './Query'
-import * as Mutation from './Mutation'
-import * as Type from './Type'
-import * as Subscription from './Subscription'
+import * as Query from './Query';
+import * as Mutation from './Mutation';
+import * as Type from './Type';
+import * as Subscription from './Subscription';
 
 const resolvers = {
   Query,
   Mutation,
   Subscription,
-  ...Type
-}
+  ...Type,
+};
 
-export default resolvers
+export default resolvers;
