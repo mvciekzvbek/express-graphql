@@ -3,8 +3,10 @@ import { GraphQLScalarType } from 'graphql';
 const Article = {
   id: parent => parent.id || parent._id,
   url: parent => `/articles/${parent._id}`,
-  author: (parent, args, { db }) => db.get().collection('users')
-    .findOne({ githubLogin: parent.author_name }),
+  author: (parent, args, { db }) => {
+    return db.get().collection('users')
+      .findOne({ githubLogin: parent.author_name }) 
+  },
   categories: async (parent, args, { db }) => {
     const categoriesToDisplay = [];
 

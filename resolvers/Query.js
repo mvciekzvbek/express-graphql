@@ -10,8 +10,6 @@ const allArticles = async (parent, args, { db }) => {
   const sort = {};
   sort[sortBy] = -1;
 
-  console.log(sort);
-
   const articlesPromise = await db.get().collection('articles')
     .find(filter)
     .limit(paging.first)

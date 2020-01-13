@@ -4,7 +4,7 @@ import 'dotenv/config';
 
 const postArticle = async (parent, args, { db, currentUser, pubsub }) => {
   if (!currentUser) {
-    throw new Error('only an authorized user can post an article');
+    throw new Error('Only an authorized user can post an article');
   }
 
   const id = await db.getNextSequence('articleid');
@@ -32,7 +32,7 @@ const postArticle = async (parent, args, { db, currentUser, pubsub }) => {
 
   await db.get().collection('articles').insertOne(newArticle);
 
-  pubsub.publish('article-added', { newArticle });
+  pubsub.publish('newArticle', { newArticle });
 
   return newArticle;
 };

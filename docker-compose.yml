@@ -1,27 +1,22 @@
-version: "3"
+version: "3.5"
+
 services:
-  mongo:
+  mymongo:
       image: mongo:latest
-      container_name: "mongo"
       volumes:
         - ./data/db:/data/db
       ports:
-          - 27017:27017
+        - 27017:27017
   app:
-    image: "node:10"
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     container_name: express-graphql
-    restart: always
     build: .
-    depends_on:
-      - mongo
-    links:
-      - mongo
-    working_dir: /home/node/app
     volumes:
-      - ./:/home/node/app
+      - "./:/usr/src/app"
     environment:
       NODE_ENV: development
     ports:
       - 3000:3000
       - 4000:4000
-    command: npm start
