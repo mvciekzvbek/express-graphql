@@ -7,7 +7,7 @@ services:
       - ./data/db:/data/db
     ports:
       - 27017:27017
-  app:
+  api:
     build:
       context: .
       dockerfile: ./Dockerfile
