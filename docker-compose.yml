@@ -2,17 +2,15 @@ version: "3.5"
 
 services:
   mymongo:
-      image: mongo:latest
-      volumes:
-        - ./data/db:/data/db
-      ports:
-        - 27017:27017
+    image: mongo:latest
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
   app:
     build:
       context: .
       dockerfile: ./Dockerfile
-    container_name: express-graphql
-    build: .
     volumes:
       - "./:/usr/src/app"
     environment:
